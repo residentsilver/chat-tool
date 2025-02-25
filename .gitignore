@@ -1,2 +1,6 @@
-/backend
-/frontend
+backend\chatApp\storage
+backend\chatApp\vendor
+backend\chatApp\node_modules
+backend\chatApp\package-lock.json
+backend\chatApp\package.json
+backend\chatApp\webpack.config.js
