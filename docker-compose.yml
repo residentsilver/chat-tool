@@ -1,0 +1,67 @@
+services:
+  # PHPサービス（Laravel用）
+  php:
+    build:
+      context: ./docker/php
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      - mysql
+    networks:
+      - chat-network
+
+  # Nginxサービス
+  nginx:
+    build:
+      context: ./docker/nginx
+    ports:
+      - "8000:80"
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      - php
+    networks:
+      - chat-network
+
+  # MySQLサービス
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+    ports:
+      - "${DB_PORT}:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    networks:
+      - chat-network
+
+  # Reactフロントエンド用Node.jsサービス
+  frontend:
+    image: node:18-alpine
+    working_dir: /app
+    volumes:
+      - ./frontend/my-react-app:/app
+    ports:
+      - "3000:3000"
+    command: sh -c "npm install && npm run dev"
+    networks:
+      - chat-network
+
+  # Redisサービス（キャッシュやWebSocketに利用）
+  redis:
+    image: redis:alpine
+    ports:
+      - "${REDIS_PORT}:6379"
+    networks:
+      - chat-network
+
+networks:
+  chat-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
