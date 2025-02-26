@@ -39,6 +39,20 @@ services:
     networks:
       - chat-network
 
+  # PhpMyAdminサービス
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      - mysql
+    networks:
+      - chat-network
+
   # Reactフロントエンド用Node.jsサービス
   frontend:
     image: node:18-alpine
